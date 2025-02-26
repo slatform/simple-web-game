@@ -1,61 +1,71 @@
+// Game setup
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth * 0.9;
-canvas.height = window.innerHeight * 0.9;
+canvas.width = 400;
+canvas.height = 600;
 
-let player = { x: canvas.width / 2, y: canvas.height - 50, width: 50, height: 50, speed: 5 };
-let obstacles = [];
-let gameSpeed = 2;
+let player = { x: 175, y: 550, width: 50, height: 20, speed: 20 };
+let blocks = [];
 let score = 0;
+let gameSpeed = 2;
 
+// Draw player
 function drawPlayer() {
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "blue";
     ctx.fillRect(player.x, player.y, player.width, player.height);
 }
 
-function drawObstacles() {
+// Draw falling blocks
+function drawBlocks() {
     ctx.fillStyle = "red";
-    obstacles.forEach(obstacle => {
-        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+    blocks.forEach(block => {
+        ctx.fillRect(block.x, block.y, block.width, block.height);
     });
 }
 
-function updateObstacles() {
-    obstacles.forEach(obstacle => {
-        obstacle.y += gameSpeed;
+// Update block positions
+function updateBlocks() {
+    blocks.forEach(block => {
+        block.y += gameSpeed;
     });
 
-    if (Math.random() < 0.02) {
-        obstacles.push({ x: Math.random() * canvas.width, y: 0, width: 50, height: 50 });
+    if (Math.random() < 0.03) { // Spawn new blocks randomly
+        blocks.push({ x: Math.random() * (canvas.width - 50), y: 0, width: 50, height: 50 });
     }
 
-    obstacles = obstacles.filter(obstacle => obstacle.y < canvas.height);
+    blocks = blocks.filter(block => block.y < canvas.height);
 }
 
-function detectCollision() {
-    for (let obstacle of obstacles) {
-        if (player.x < obstacle.x + obstacle.width &&
-            player.x + player.width > obstacle.x &&
-            player.y < obstacle.y + obstacle.height &&
-            player.y + player.height > obstacle.y) {
-            alert(`Game Over! Score: ${score}`);
-            document.location.reload();
+// Check collision
+function checkCollision() {
+    for (let i = 0; i < blocks.length; i++) {
+        let block = blocks[i];
+        if (
+            player.x < block.x + block.width &&
+            player.x + player.width > block.x &&
+            player.y < block.y + block.height &&
+            player.y + player.height > block.y
+        ) {
+            score += 10;
+            document.getElementById("score").textContent = score;
+            blocks.splice(i, 1); // Remove block
+            gameSpeed += 0.1; // Increase difficulty
         }
     }
 }
 
+// Game loop
 function gameLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawPlayer();
-    drawObstacles();
-    updateObstacles();
-    detectCollision();
-    score++;
-    gameSpeed += 0.001;
+    drawBlocks();
+    updateBlocks();
+    checkCollision();
     requestAnimationFrame(gameLoop);
 }
 
+// Player movement
 document.addEventListener("keydown", (event) => {
     if (event.key === "ArrowLeft" && player.x > 0) {
         player.x -= player.speed;
@@ -65,4 +75,5 @@ document.addEventListener("keydown", (event) => {
     }
 });
 
+// Start game
 gameLoop();
