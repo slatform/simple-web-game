@@ -6,13 +6,15 @@
 }
 
 body {
-    background-color: #111;
+    background-color: skyblue;
     color: white;
+    overflow: hidden;
 }
 
 canvas {
-    background-color: black;
+    background-color: rgba(255, 255, 255, 0.5);
     border: 2px solid white;
     display: block;
     margin: 20px auto;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
 }
